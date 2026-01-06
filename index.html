@@ -1,347 +1,367 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <title>GreenWire Chat</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    :root {
-      --bg: #050805;
-      --panel: #0b120b;
-      --green: #00ff88;
-      --green-dim: #00aa66;
-      --text: #d7ffe9;
-      --border: #123d2a;
-      --system: #7fe3b4;
-    }
+    <meta charset="UTF-8" />
+    <title>GreenWire Chat</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        :root {
+            --bg: #050805;
+            --panel: #0b120b;
+            --green: #00ff88;
+            --green-dim: #00aa66;
+            --text: #d7ffe9;
+            --border: #123d2a;
+            --system: #7fe3b4;
+        }
 
-    * { box-sizing: border-box; font-family: system-ui, monospace; }
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, monospace;
+        }
 
-    body {
-      margin: 0;
-      background: radial-gradient(circle at top, #0a140f, var(--bg));
-      color: var(--text);
-      height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+        body {
+            margin: 0;
+            background: radial-gradient(circle at top, #0a140f, var(--bg));
+            color: var(--text);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-    .app {
-      width: 95%;
-      max-width: 900px;
-      height: 90vh;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      box-shadow: 0 0 40px rgba(0,255,136,0.15);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
+        .app {
+            width: 95%;
+            max-width: 900px;
+            height: 90vh;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            box-shadow: 0 0 40px rgba(0, 255, 136, 0.15);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
 
-    header {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background: var(--panel);
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  color: var(--green);
-  font-weight: 600;
-}
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: var(--panel);
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--green);
+            font-weight: 600;
+        }
 
-    .screen {
-      flex: 1;
-      display: none;
-      padding: 20px;
-    }
+        .screen {
+            flex: 1;
+            display: none;
+            padding: 20px;
+        }
 
-    .screen.active { display: block; }
+        .screen.active {
+            display: block;
+        }
 
-    .center {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      max-width: 400px;
-      margin: 60px auto;
-    }
+        .center {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            max-width: 400px;
+            margin: 60px auto;
+        }
 
-    input, button {
-      background: #050805;
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 12px;
-      border-radius: 6px;
-      font-size: 15px;
-    }
+        .scrollable-div {
+            height: 400px;
+            overflow-y: auto;
+        }
 
-    input::placeholder { color: #6fae91; }
+        input,
+        button {
+            background: #050805;
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 15px;
+        }
 
-    button {
-      cursor: pointer;
-      color: var(--green);
-      border-color: var(--green-dim);
-    }
+        input::placeholder {
+            color: #6fae91;
+        }
 
-    button:hover { background: #08130c; }
+        button {
+            cursor: pointer;
+            color: var(--green);
+            border-color: var(--green-dim);
+        }
 
-    .chat {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-    }
+        button:hover {
+            background: #08130c;
+        }
 
-    .messages {
-      flex: 1;
-      overflow-y: auto;
-      padding-right: 6px;
-      scroll-behavior: smooth;
-    }
+        .chat {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
 
-    .msg {
-      margin-bottom: 10px;
-      padding: 6px 10px;
-      background: #060e09;
-      border-radius: 4px;
-    }
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 6px;
+            scroll-behavior: smooth;
+        }
 
-    .msg.system {
-      color: var(--system);
-      border-left: 3px solid var(--system);
-    }
+        .msg {
+            margin-bottom: 10px;
+            padding: 6px 10px;
+            background: #060e09;
+            border-radius: 4px;
+        }
 
-    .msg .header-line {
-      display: flex;
-      align-items: baseline;
-      gap: 6px;
-      margin-bottom: 2px;
-    }
+        .msg.system {
+            color: var(--system);
+            border-left: 3px solid var(--system);
+        }
 
-    .msg .name {
-      color: var(--green);
-      font-weight: 600;
-      font-size: 13px;
-    }
+        .msg .header-line {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            margin-bottom: 2px;
+        }
 
-    .msg.system .name {
-      color: var(--system);
-    }
+        .msg .name {
+            color: var(--green);
+            font-weight: 600;
+            font-size: 13px;
+        }
 
-    .msg .time {
-      font-size: 11px;
-      opacity: 0.7;
-      font-family: monospace;
-    }
+        .msg.system .name {
+            color: var(--system);
+        }
 
-    .msg .text {
-      font-size: 14px;
-      white-space: pre-wrap;
-      word-wrap: break-word;
-    }
+        .msg .time {
+            font-size: 11px;
+            opacity: 0.7;
+            font-family: monospace;
+        }
 
-    .inputbar {
-      display: flex;
-      gap: 8px;
-      border-top: 1px solid var(--border);
-      padding-top: 10px;
-    }
+        .msg .text {
+            font-size: 14px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
 
-    .inputbar input[type="text"] { flex: 1; }
+        .inputbar {
+            display: flex;
+            gap: 8px;
+            border-top: 1px solid var(--border);
+            padding-top: 10px;
+        }
 
-    footer {
-      font-size: 11px;
-      opacity: 0.6;
-      padding: 6px 10px;
-      border-top: 1px solid var(--border);
-      text-align: center;
-    }
-  </style>
+        .inputbar input[type="text"] {
+            flex: 1;
+        }
+
+        footer {
+            font-size: 11px;
+            opacity: 0.6;
+            padding: 6px 10px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+    </style>
 </head>
+
 <body>
-  <div class="app">
-    <header>
-      <span>GreenWire · Room: <span id="roomTag">—</span></span>
-      <span id="userTag"></span>
-    </header>
+    <div class="app">
+        <header>
+            <span>GreenWire · Room: <span id="roomTag">—</span></span>
+            <span id="userTag"></span>
+        </header>
 
-    <!-- NAME SCREEN -->
-    <div class="screen active" id="screen-name">
-      <div class="center">
-        <h2>Enter a temporary name</h2>
-        <input id="nameInput" placeholder="anonymous" maxlength="20" />
-        <button onclick="setName()">Enter</button>
-      </div>
-    </div>
+        <!-- NAME SCREEN -->
+        <div class="screen active" id="screen-name">
+            <div class="center">
+                <h2>Enter a temporary name</h2>
+                <input id="nameInput" placeholder="anonymous" maxlength="20" />
+                <button onclick="setName()">Enter</button>
 
-    <!-- ROOM SCREEN -->
-    <div class="screen" id="screen-room">
-      <div class="center">
-        <h2>Join or create a chat</h2>
-        <input id="roomInput" placeholder="Chat code (or generate one)" />
-        <button onclick="joinRoom()">Connect</button>
-        <button onclick="generateAndJoin()">Generate Chat</button>
-        <p style="opacity:.6">Owner code: <b>Own3r</b></p>
-      </div>
-    </div>
-
-    <!-- CHAT SCREEN -->
-    <div class="screen" id="screen-chat">
-      <div class="chat">
-        <div class="messages" id="messages"></div>
-        <div class="inputbar">
-          <input id="msgInput" type="text" placeholder="Type a message..." />
-          <button onclick="sendMsg()">Send</button>
+            </div>
         </div>
-      </div>
+        <!-- ROOM SCREEN -->
+        <div class="screen" id="screen-room">
+            <div class="center">
+                <h2>Join or create a chat</h2>
+                <input id="roomInput" placeholder="Chat code (or generate one)" />
+                <button onclick="joinRoom()">Connect</button>
+                <button onclick="generateAndJoin()">Generate Chat</button>
+                <p style="opacity:.6">Owner code: <b>Own3r</b></p>
+            </div>
+        </div>
+
+        <!-- CHAT SCREEN -->
+        <div class="screen scrollable-div" id="screen-chat">
+            <div class="chat">
+                <div class="messages" id="messages"></div>
+                <div class="inputbar">
+                    <input id="msgInput" type="text" placeholder="Type a message..." />
+                    <button onclick="sendMsg()">Send</button>
+                </div>
+            </div>
+        </div>
+
+        <footer>Session-only profile · No accounts · Made by Meau · Powered by Github and SupaBase </footer>
     </div>
 
-    <footer>Session-only profile · No accounts · Made by Meau · Powered by Github and SupaBase </footer>
-  </div>
+    <!-- Supabase client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
 
-  <!-- Supabase client -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
+            const supabase = window.supabase.createClient(
+                'https://bqwdogueiqutcqsdxhuk.supabase.co',
+                'sb_publishable_AdKx8RYpbDdfUGe-iiktHQ_Ua_BVfnE'
+            );
 
-      const supabase = window.supabase.createClient(
-        'https://bqwdogueiqutcqsdxhuk.supabase.co',
-        'sb_publishable_AdKx8RYpbDdfUGe-iiktHQ_Ua_BVfnE'
-      );
+            const nameInput = document.getElementById('nameInput');
+            const roomInput = document.getElementById('roomInput');
+            const msgInput = document.getElementById('msgInput');
+            msgInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMsg();
+                }
+            });
 
-      const nameInput = document.getElementById('nameInput');
-      const roomInput = document.getElementById('roomInput');
-      const msgInput = document.getElementById('msgInput');
-      msgInput.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    sendMsg();
-  }
-});
+            const messagesEl = document.getElementById('messages');
+            const userTag = document.getElementById('userTag');
+            const roomTag = document.getElementById('roomTag');
 
-      const messagesEl = document.getElementById('messages');
-      const userTag = document.getElementById('userTag');
-      const roomTag = document.getElementById('roomTag');
+            let username = null;
+            let room = null;
+            let supabaseChannel = null;
 
-      let username = null;
-      let room = null;
-      let supabaseChannel = null;
+            window.setName = setName;
+            window.joinRoom = joinRoom;
+            window.generateAndJoin = generateAndJoin;
+            window.sendMsg = sendMsg;
 
-      window.setName = setName;
-      window.joinRoom = joinRoom;
-      window.generateAndJoin = generateAndJoin;
-      window.sendMsg = sendMsg;
-
-      function generateRoom() {
-        return Math.random().toString(36).substring(2, 8).toUpperCase();
-      }
-
-      function generateAndJoin() {
-        roomInput.value = generateRoom();
-        joinRoom();
-      }
-
-      function show(id) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-      }
-
-      function setName() {
-        username = nameInput.value.trim() || 'anonymous';
-        userTag.textContent = username;
-        show('screen-room');
-      }
-
-      function formatTime(ts) {
-        const d = ts ? new Date(ts) : new Date();
-        return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      }
-
-      async function joinRoom() {
-        room = (roomInput.value.trim() || generateRoom()).toUpperCase();
-        roomTag.textContent = room;
-        show('screen-chat');
-
-        messagesEl.innerHTML = '';
-
-        const { data, error } = await supabase
-          .from('messages')
-          .select('*')
-          .eq('room', room)
-          .order('inserted_at', { ascending: true });
-
-        if (error) {
-          addMsg('SYSTEM', 'Error loading previous messages.', null, true);
-        } else {
-          data.forEach(m => addMsg(m.username, m.content, m.inserted_at, false));
-        }
-
-        addMsg('SYSTEM', `Joined room: ${room}`, null, true);
-
-        if (supabaseChannel) supabase.removeChannel(supabaseChannel);
-
-        supabaseChannel = supabase
-          .channel('room-' + room)
-          .on('postgres_changes',
-            { event: 'INSERT', schema: 'public', table: 'messages', filter: `room=eq.${room}` },
-            payload => {
-              const m = payload.new;
-              addMsg(m.username, m.content, m.inserted_at, false);
+            function generateRoom() {
+                return Math.random().toString(36).substring(2, 8).toUpperCase();
             }
-          )
-          .subscribe();
-      }
 
-      async function sendMsg() {
-        const text = msgInput.value.trim();
-        if (!text) return;
+            function generateAndJoin() {
+                roomInput.value = generateRoom();
+                joinRoom();
+            }
 
-        await supabase.from('messages').insert([{ room, username, content: text }]);
+            function show(id) {
+                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+                document.getElementById(id).classList.add('active');
+            }
 
-        msgInput.value = '';
-      }
+            function setName() {
+                username = nameInput.value.trim() || 'anonymous';
+                userTag.textContent = username;
+                show('screen-room');
+            }
 
-      function addMsg(name, text, timestamp = null, isSystem = false) {
+            function formatTime(ts) {
+                const d = ts ? new Date(ts) : new Date();
+                return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            }
 
-        const div = document.createElement('div');
-        div.className = 'msg';
-        if (isSystem) div.classList.add('system');
+            async function joinRoom() {
+                room = (roomInput.value.trim() || generateRoom()).toUpperCase();
+                roomTag.textContent = room;
+                show('screen-chat');
 
-        const header = document.createElement('div');
-        header.className = 'header-line';
+                messagesEl.innerHTML = '';
 
-        const nameSpan = document.createElement('span');
-        nameSpan.className = 'name';
-        nameSpan.textContent = name;
+                const { data, error } = await supabase
+                    .from('messages')
+                    .select('*')
+                    .eq('room', room)
+                    .order('inserted_at', { ascending: true });
 
-        const timeSpan = document.createElement('span');
-        timeSpan.className = 'time';
-        timeSpan.textContent = formatTime(timestamp);
+                if (error) {
+                    addMsg('SYSTEM', 'Error loading previous messages.', null, true);
+                } else {
+                    data.forEach(m => addMsg(m.username, m.content, m.inserted_at, false));
+                }
 
-        header.appendChild(nameSpan);
-        header.appendChild(timeSpan);
+                addMsg('SYSTEM', `Joined room: ${room}`, null, true);
 
-        const textDiv = document.createElement('div');
-        textDiv.className = 'text';
-        textDiv.textContent = text;
+                if (supabaseChannel) supabase.removeChannel(supabaseChannel);
 
-        div.appendChild(header);
-        div.appendChild(textDiv);
+                supabaseChannel = supabase
+                    .channel('room-' + room)
+                    .on('postgres_changes',
+                        { event: 'INSERT', schema: 'public', table: 'messages', filter: `room=eq.${room}` },
+                        payload => {
+                            const m = payload.new;
+                            addMsg(m.username, m.content, m.inserted_at, false);
+                        }
+                    )
+                    .subscribe();
+            }
 
-        const nearBottom =
-          messagesEl.scrollTop + messagesEl.clientHeight >= messagesEl.scrollHeight - 80;
+            async function sendMsg() {
+                const text = msgInput.value.trim();
+                if (!text) return;
 
-        messagesEl.appendChild(div);
+                await supabase.from('messages').insert([{ room, username, content: text }]);
 
-        if (nearBottom || name === username) {
-          div.scrollIntoView({ behavior: 'smooth' });
-        }
-      }
+                msgInput.value = '';
+            }
 
-    });
-  </script>
+            function addMsg(name, text, timestamp = null, isSystem = false) {
+
+                const div = document.createElement('div');
+                div.className = 'msg';
+                if (isSystem) div.classList.add('system');
+
+                const header = document.createElement('div');
+                header.className = 'header-line';
+
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'name';
+                nameSpan.textContent = name;
+
+                const timeSpan = document.createElement('span');
+                timeSpan.className = 'time';
+                timeSpan.textContent = formatTime(timestamp);
+
+                header.appendChild(nameSpan);
+                header.appendChild(timeSpan);
+
+                const textDiv = document.createElement('div');
+                textDiv.className = 'text';
+                textDiv.textContent = text;
+
+                div.appendChild(header);
+                div.appendChild(textDiv);
+
+                const nearBottom =
+                    messagesEl.scrollTop + messagesEl.clientHeight >= messagesEl.scrollHeight - 80;
+
+                messagesEl.appendChild(div);
+
+                if (nearBottom || name === username) {
+                    div.scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+
+        });
+    </script>
 </body>
+
 </html>
